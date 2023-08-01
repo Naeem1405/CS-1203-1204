@@ -1,6 +1,11 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+int user_count = -1;
+int current_user_idx = -1;
+
+
+bool verifyOTP();
 
 class Member{
     private:
@@ -8,9 +13,11 @@ class Member{
         string name;
         string pin;
         double balance;
+        bool is_active;
     
     public:
         bool logged_in = false;
+        
         string getPhone(){
             return phone;
         }
@@ -22,6 +29,11 @@ class Member{
             name = _name;
             pin = _pin;
             balance = 0;
+            is_active = true;
+        }
+        
+        bool checkStatus(){
+            return is_active;
         }
 
         void printMember(){
@@ -29,59 +41,93 @@ class Member{
             cout << "Name: " << name << "\n";
             cout << "PIN: " << pin << "\n";
             cout << "Balance : " << balance << "\n";
+            cout << "status : " << is_active << "\n";
         }
 
+        void checkBalance(){
+            cout << "Current Balance: " << balance << "\n";
+        }
+
+        void logout(){
+            // cout << "logout" << "\n";
+            logged_in = false;
+            current_user_idx = -1;
+            cout << "Successfully Logged out.\n";
+
+        }
+
+        void update(){
+            char op;
+            cout << "Do you want to update name? :_ ";
+            cin >> op;
+            if( op == 'y'){
+                cout << "Name: ";
+                cin >> name;
+                cout << "Name successfully changed.\n";
+            }
+            cout << "Do you want to update pin? :_ ";
+            cin >> op;
+            if( op == 'y'){
+                string npin, npin2;
+                cout << "New pin: ";
+                cin >> npin;
+                cout << "Retype new pin: ";
+                cin >> npin2;
+                if( npin == npin2 ){
+                    bool otp_verify = verifyOTP();
+                    if( otp_verify){
+                        pin = npin;
+                        cout << "Pin successfully updated.\n";
+                    }
+                    else{
+                        cout << "Incorrect OTP.\n";
+                    }
+                }
+                else{
+                    cout << "Pin doesn't match.\n";
+                }
+                
+            }
+
+
+        }
+
+        bool remove(){
+            string upin;
+            cout << "Enter your pin: ";
+            cin >> upin;
+            if( pin == upin){
+                bool otp_verify = verifyOTP();
+                if(otp_verify){
+                    is_active = false;
+                    return true;
+                }
+                else{
+                    cout << "OTP doesn't match.\n";
+                }
+            }
+            else{
+                cout << "Pin doesn't match.\n";
+            }
+
+            return false;
+
+        }
         
 };
 
-int user_count = -1;
-Member users[1000];
-int current_user_idx = -1;
 
-int login();
+Member users[1000];
+
 
 int searchMember(string phone){
     for(int i = 0; i <= user_count; i++){
-        if(users[i].getPhone() == phone ){
+        if(users[i].getPhone() == phone && users[i].checkStatus()){
             return i;
         }
 
     }
     return -1;
-}
-
-void update(){
-    cout << "update menu\n";
-}
-void remove(){
-    cout << "remove\n";
-}
-void sendMoney(){
-    cout << "send money" << "\n";
-}
-void cashIn(){
-    cout << "cash in \n";
-}
-void cashOut(){
-    cout << "cash out" << "\n";
-}
-void payBill(){
-    cout << "pay bill" << "\n";
-}
-void checkBalance(){
-    cout << "check balance " << "\n";
-}
-void history(){
-    cout << "history" << "\n";
-}
-void logout(){
-    cout << "logout" << "\n";
-    users[current_user_idx].logged_in = false;
-    current_user_idx = -1;
-    cout << "Successfully Logged out.\n";
-    // login();
-
-
 }
 
 bool verifyOTP(){
@@ -113,6 +159,23 @@ int getPin(){
     cout << "\n";
     return (stoi(pass));
 }
+
+void sendMoney(){
+    cout << "send money" << "\n";
+}
+void cashIn(){
+    cout << "cash in \n";
+}
+void cashOut(){
+    cout << "cash out" << "\n";
+}
+void payBill(){
+    cout << "pay bill" << "\n";
+}
+void history(){
+    cout << "history" << "\n";
+}
+
 
 
 void Register(){
@@ -150,7 +213,6 @@ void Register(){
     }
     else{
         cout << "Another user with this phone number exists. User another phone number or log in . \n";
-        // login();
     }
 
     
@@ -173,13 +235,18 @@ void mainMenu(){
     int op;
     cin >> op;
     if( op == 1){
-        update();
+        users[current_user_idx].update();
     }
     else if ( op == 2){
-        remove();
+        bool removed = users[current_user_idx].remove();
+        if (removed){
+            users[current_user_idx].logout();
+            return;
+        }
     }
     else if ( op == 3){
         sendMoney();
+
     }
     else if (op == 4){
         cashIn();
@@ -191,13 +258,13 @@ void mainMenu(){
         payBill();
     }
     else if (op == 7){
-        checkBalance();
+        users[current_user_idx].checkBalance();
     }
     else if ( op == 8){
         history();
     }
     else if ( op == 9){
-        logout();
+        users[current_user_idx].logout();
         return;
     }
     else{
@@ -215,7 +282,6 @@ bool loginMenu(){
     int idx = searchMember(phone);
     if( idx == -1){
         cout << "No user found\n";
-        // login();
     }
     else{
         string pin;
