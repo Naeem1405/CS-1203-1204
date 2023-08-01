@@ -38,7 +38,7 @@ int user_count = -1;
 Member users[1000];
 int current_user_idx = -1;
 
-int login();
+void login();
 
 int searchMember(string phone){
     for(int i = 0; i <= user_count; i++){
@@ -79,7 +79,7 @@ void logout(){
     users[current_user_idx].logged_in = false;
     current_user_idx = -1;
     cout << "Successfully Logged out.\n";
-    // login();
+    login();
 
 
 }
@@ -150,7 +150,7 @@ void Register(){
     }
     else{
         cout << "Another user with this phone number exists. User another phone number or log in . \n";
-        // login();
+        login();
     }
 
     
@@ -208,14 +208,14 @@ void mainMenu(){
 }
 
 
-bool loginMenu(){
+void loginMenu(){
     string phone, pin;
     cout << "Phone: ";
     cin >> phone;
     int idx = searchMember(phone);
     if( idx == -1){
         cout << "No user found\n";
-        // login();
+        login();
     }
     else{
         string pin;
@@ -224,53 +224,48 @@ bool loginMenu(){
         if( pin == users[idx].getPin()){
             users[idx].logged_in = true;
             current_user_idx = idx;
-            return true;
+            mainMenu();
         }
         else{
-            cout << "Wrong pin. Try again.\n";
+            cout << "Wrong pin\n. Try again.\n";
+            loginMenu();
         }
     }
 
-    return false;
+    return;
+
+
 }
 
 
-int login(){
+void login(){
     cout << "1. Login\n";
     cout << "2. Regiser\n";
     cout << "3. Exit\n";
     cout << "   Enter your opiton:_ ";
     int op;
     cin >> op;
-    return op;
+    if( op == 1){
+        loginMenu();
+    }
+    else if( op == 2){
+        Register();
+    }
+    else if ( op == 3){
+        return;
+    }
+    else{
+        cout << "Enter valid option.\n";
+    }
+    login();
+    return;
+
 }
 
 // end of MENU
 int main(){
 
-    while(1){
-        int op = login();
-        if( op == 1){
-            bool logged_in = loginMenu();
-            if( logged_in ){
-                mainMenu();
-            }
-            else{
-                
-            }
-        }
-        else if( op == 2){
-            Register();
-        }
-        else if ( op == 3){
-            break;
-        }
-        else{
-            cout << "Enter valid option.\n";
-        }
-    
-    }
-
+    login();
     for(int i = 0; i <= user_count ;i++){
         users[i].printMember();
     }
