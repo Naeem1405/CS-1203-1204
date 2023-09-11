@@ -41,7 +41,6 @@ class Bank{
         }
         void display_n(){
             cout <<"N: " << n << "\n";
-            // return n;
         }
         void display_all()const{
             cout << "ID: " << id <<"\n";
@@ -54,8 +53,8 @@ class Bank{
         float getAmount(){
             return amount;
         }
-        void showTotal(){
-            cout << "Total Amount: " << total << "\n";
+        int get_n(){
+            return n;
         }
         
 };
@@ -73,18 +72,8 @@ int main(){
     client_3.setID(3);
     client_2.changeAmount(241.4);
     
-    client_1.display_all();
-    cout << "\n";
-    client_2.display_all();
-    cout << "\n";
-    client_3.display_all();
-    cout << "\n";
-    client_4.display_all();
-    cout << "\n";
-    client_5.display_all();
-    cout << "\n";
-    client_1.display_n();
-
-    client_1.showTotal();
+    cout << "Total client: " << client_1.get_n() << "\n";
+    cout << "Total amount: " << client_1.getAmount() + client_2.getAmount() + client_3.getAmount() + client_4.getAmount() + client_5.getAmount() << "\n";
+    
 
 }
