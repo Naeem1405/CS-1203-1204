@@ -1,21 +1,19 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-int main(){
-    
-    struct Member
-    {
-        int id;
-        float height;
-        float weight;
-    };
+struct Member{
+    int id;
+    float height;
+    float weight;
+    bool exist;
+};
 
-    vector<struct Member> users;
-    int member_count = 0;
-    
+struct Member mx[10000];
+int total = -1;
 
-    // Menu
-    cout << "********** Main Menu ********\n";
+int menu (){
+    int op;
+    cout << "\n********** Main Menu ********\n";
     cout << "   1. Add Member\n";
     cout << "   2. Update Member\n";
     cout << "   3. Remove Member\n";
@@ -23,144 +21,177 @@ int main(){
     cout << "   5. Min Height and Weight\n";
     cout << "   6. Average Height and Weight\n";
     cout << "   7. BMI Classification\n";
-    cout << "   8. Exit\n";
-    cout << "      Enter Your option(1-8):_ ";
-    int input;
-    cin >> input;
+    cout << "   8. Display all members\n";
+    cout << "   0. Exit\n";
+    cout << "      Enter Your option(0-8):_ ";
+    cin >> op;
+    return op;
+}
 
-    if(input == 0){
+int searchMember(int id){
+    for(int i = 0; i <= total; i++){
+        if(mx[i].id == id){
+            return i;
+        }
+    }
+    return -1;
 
+}
+void addMember(){
+    cout << "Enter Member ID: ";
+    int id;
+    cin >> id;
+    int idx = searchMember(id);
+    if(idx == -1){
+        total++;
+        mx[total].id = id;
+    }
+    else{
+        cout << "Duplicate id detected.Enter different ID.\n";
+        return;
     }
 
-    if(input == 1){
-        cout << "Member ID: ";
-        cin >> users[member_count].id;
-        cout << "\nHeight: ";
-        cin >> users[member_count].height;
-        cout << "\nWeight: ";
-        cin >> users[member_count].weight;
-        cout<< "\n";
-        member_count++;
-    }
+    cout << "Height: ";
+    cin >>mx[total].height;
+    cout << "Weight: ";
+    cin >>mx[total].weight;
+    mx[total].exist = true;
+    return;
+}
 
-    if(input == 2){
-        cout << "Member ID: ";
-        int id ;
-        cin >> id;
-        for(int i = 0; i < member_count; i++){
-            if(users[i].id == id){
-                cout << "\nHeight: ";
-                cin >> users[i].height;
-                cout << "\nWeight: ";
-                cin >> users[i].weight;
-                cout<< "\n";
-            }
+void updateMember(){
+    int id;
+    cout << "Enter Member ID: ";
+    cin>> id;
+    int idx = searchMember(id);
+    if( idx == -1){
+        cout << "Member Doesn't exist.\n";
+    }
+    else{
+        cout << "Height: ";
+        cin >>mx[idx].height;
+        cout << "Weight: ";
+        cin >>mx[idx].weight;
+        cout << "Updated successfully.\n";
+    }
+    return;
+}
+
+void deleteMember(){
+    int id;
+    cout << "Member id: ";
+    cin >> id;
+    int index = searchMember(id);
+    if( index == -1){
+        cout << "No member with id " << id << "\n";
+    }
+    else{
+        mx[index].exist = false;
+        cout << "Member Deleted.\n";
+    }
+    return;
+
+}
+void displayMember(){
+        cout << "SL\tID\tHeight\tWeight\n";
+    for(int i = 0; i <= total; i++){
+        if(mx[i].exist == true){
+            cout << i + 1 << "\t" << mx[i].id << "\t" << mx[i].height << "\t" << mx[i].weight << "\n";
         }
     }
 
-    if(input == 3){
-        cout << "Member ID: ";
-        int id;
-        cin >> id;
-        for(int i = 0; i < member_count; i++){
-            if(users[i].id == id){
-                for(int j = i; j < member_count;j++){
-                    users[i].id = users[j].id;
-                    users[i].weight = users[j].weight;
-                    users[i].height = users[j].height;
-                }
-                member_count--;
-                cout << "Member Removed.";
-                break;
-
-            }
+}
+void maxHeightWeight(){
+    float max_h = 0;
+    float max_w = 0;
+    for(int i = 0; i <= total; i++){
+        if( mx[i].exist == true){
+            max_h = max(max_h,mx[i].height);
+            max_w = max(max_w,mx[i].weight);
         }
     }
+    cout << "Max Height: " << max_h << "\n";
+    cout << "Max Weight: " << max_w << "\n";
+    return;
+}
+void minHeightWeight(){
+    float min_h = 10000;
+    float min_w = 10000;
+    for(int i = 0; i <= total; i++){
+        if( mx[i].exist == true){
+            min_h = min(min_h,mx[i].height);
+            min_w = min(min_w,mx[i].weight);
+        }
+    }
+    cout << "Min Height: " << min_h << "\n";
+    cout << "Min Weight: " << min_w << "\n";
+    return;
+}
+void avgHeightWeight(){
+    float avg_h = 0;
+    float avg_w = 0;
+    int count  = 0;
+    for(int i = 0; i <= total; i++){
+        if(mx[i].exist == true){
+            count++;
+            avg_h += mx[i].height;
+            avg_w += mx[i].weight;
+        }
+    }
+    cout << "Average Height: " << avg_h / count << "\n";
+    cout << "Average Weight: " << avg_w / count << "\n";
+    return;
+}
+
+void bmiClass(){
+    int id;
+    cout << "Member ID: ";
+    cin >> id;
+    int idx = searchMember(id);
+    if( idx == -1){
+        cout << "No member found\n";
+    }
+    else{
+        float BMI = mx[idx].weight / (mx[idx].height * mx[idx].height);
+        cout << "BMI: " << BMI << endl;
+        if (BMI < 16)
+            cout << "Classification: Severe Thinness" << endl;
+        else if (BMI >= 16 && BMI < 17)
+            cout << "Classification: Moderate Thinness" << endl;
+        else if (BMI >= 17 && BMI < 18.5)
+            cout << "Classification: Mild Thinness" << endl;
+        else if (BMI >= 18.5 && BMI < 25)
+            cout << "Classification: Normal" << endl;
+        else if (BMI >= 25 && BMI < 30)
+            cout << "Classification: Overweight" << endl;
+        else if (BMI >= 30 && BMI < 35)
+            cout << "Classification: Obese Class I" << endl;
+        else if (BMI >= 35 && BMI < 40)
+            cout << "Classification: Obese Class II" << endl;
+        else if (BMI >= 40)
+            cout << "Classification: Obese Class III" << endl;
+    }
+    return;
+}
+
+int main(){
     
-    if( input == 4){
-        float max_height =  INT_MIN;
-        float max_weight = INT_MIN;
-        for(int i = 0; i < member_count; i++){
-            if( users[i].height > max_height){
-                max_height = users[i].height;
-            }
-            if(users[i].weight > max_weight){
-                max_weight = users[i].weight;
-            }
+    int option;
+    while(1){
+        option = menu();
+        if(option == 0){
+            cout << "End of program run....\n";
+            break;
         }
-        cout << "Max Height: " <<  max_height << endl;
-        cout << "Max Weight: " <<  max_weight << endl;
-    }
-
-    if( input == 5){
-        float min_height =  INT_MAX;
-        float min_weight = INT_MAX;
-        for(int i = 0; i < member_count; i++){
-            if( users[i].height < min_height){
-                min_height = users[i].height;
-            }
-            if(users[i].weight < min_weight){
-                min_weight = users[i].weight;
-            }
-        }
-        cout << "Min Height: " <<  min_height << endl;
-        cout << "Min Weight: " <<  min_weight << endl;
-    }
-
-    if( input == 6){
-        float height_sum = 0;
-        float weight_sum = 0;
-        for(int i = 0; i < member_count; i++){
-            height_sum += users[i].height;
-            weight_sum += users[i].weight;
-        }
-        if(member_count == 0){
-            cout << "There are no member.";
-        }
-        else{
-            cout << "Average Height: " << height_sum / member_count << endl;
-            cout << "Average Weight: " << weight_sum / member_count; 
+        switch(option){
+            case 1: addMember();break;
+            case 2: updateMember();break;
+            case 3: deleteMember();break;
+            case 4: maxHeightWeight();break;
+            case 5: minHeightWeight();break;
+            case 6: avgHeightWeight();break;
+            case 7: bmiClass(); break;
+            case 8: displayMember();break;
         }
     }
-
-    if(input == 7){
-        int id;
-        cout << "Member ID: ";
-        cin >> id;
-        for(int i = 0; i < member_count; i++){
-            if(users[i].id == id){
-                float BMI = users[i].weight / ( users[i].height * users[i].height);
-                cout << "BMI: " << BMI<< endl;
-                if(BMI < 16){
-                    cout << "Classification: Severe Thinness" << endl;
-                }
-
-                if(BMI <= 16 && BMI < 17){
-                    cout << "Classification: Moderate Thinness" << endl;
-                }
-                 if(BMI <=17 && BMI < 18.5){
-                    cout << "Classification: Mild Thinness" << endl;
-                }
-
-                if(BMI <= 18.5 && BMI <25){
-                    cout << "Classification: Normal" << endl;
-                }
-                if(BMI <= 25 && BMI < 30){
-                    cout << "Classification: Overweight" << endl;
-                }
-                if(BMI <= 30 && BMI < 35){
-                    cout << "Classification: Obese Class I" << endl;
-                }
-                if(BMI <= 35 && BMI < 40){
-                    cout << "Classification: Obese Class II" << endl;
-                }
-                if(BMI >= 40){
-                    cout << "Classification: Obese Class III" << endl;
-                }
-
-
-            }
-        }
-    }
-    
 }
